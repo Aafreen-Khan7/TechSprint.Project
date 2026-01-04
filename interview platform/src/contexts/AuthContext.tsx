@@ -18,7 +18,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signup: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
   hrSignup: (email: string, password: string, name: string, companyName: string, companySize: string, hrRole: string, companyWebsite?: string, linkedin?: string) => Promise<{ success: boolean; error?: string }>;
-  loginWithGoogle: () => Promise<{ success: boolean; error?: string }>;
+  loginWithGoogle: (role?: 'candidate' | 'HR') => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -41,11 +41,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           
           if (!profile) {
             // Create profile for new users (e.g., Google sign-in)
-            profile = await createUserProfile(
-              fbUser.uid,
-              fbUser.email || '',
-              fbUser.displayName || 'User'
-            );
+            const pendingRole = sessionStorage.getItem('pendingRole') as 'candidate' | 'HR' | null;
+            
+            if (pendingRole === 'HR') {
+              profile = await createHRUserProfile(
+                fbUser.uid,
+                fbUser.email || '',
+                fbUser.displayName || 'HR User',
+                'Your Company', // Default values for Google HR signup
+                '1-10 employees',
+                'HR Manager'
+              );
+            } else {
+              profile = await createUserProfile(
+                fbUser.uid,
+                fbUser.email || '',
+                fbUser.displayName || 'User'
+              );
+            }
+            sessionStorage.removeItem('pendingRole');
           }
           
           setUser(profile);
@@ -113,11 +127,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const loginWithGoogle = async (): Promise<{ success: boolean; error?: string }> => {
+  const loginWithGoogle = async (role: 'candidate' | 'HR' = 'candidate'): Promise<{ success: boolean; error?: string }> => {
     try {
+      sessionStorage.setItem('pendingRole', role);
       await signInWithPopup(auth, googleProvider);
       return { success: true };
     } catch (error: any) {
+      sessionStorage.removeItem('pendingRole');
       console.error('Google login error:', error);
       if (error.code === 'auth/popup-closed-by-user') {
         return { success: false, error: 'Sign-in cancelled' };

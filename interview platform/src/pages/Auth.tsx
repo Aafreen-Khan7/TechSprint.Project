@@ -105,7 +105,7 @@ const Auth = () => {
 
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);
-    const result = await loginWithGoogle();
+    const result = await loginWithGoogle('candidate');
     setIsGoogleLoading(false);
 
     if (result.success) {
