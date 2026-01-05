@@ -137,13 +137,12 @@ export async function deleteHiringPost(postId: string): Promise<void> {
 export async function getHRHiringPosts(hrId: string): Promise<HiringPost[]> {
   const q = query(
     collection(db, 'hiring_posts'),
-    where('hrId', '==', hrId),
-    orderBy('createdAt', 'desc')
+    where('hrId', '==', hrId)
   );
   
   const snapshot = await getDocs(q);
   
-  return snapshot.docs.map(doc => {
+  const posts = snapshot.docs.map(doc => {
     const data = doc.data();
     return {
       id: doc.id,
@@ -153,6 +152,9 @@ export async function getHRHiringPosts(hrId: string): Promise<HiringPost[]> {
       createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(data.createdAt),
     } as HiringPost;
   });
+
+  // Sort manually to avoid composite index requirement in production
+  return posts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }
 
 export async function getAllHiringPosts(): Promise<HiringPost[]> {
@@ -316,13 +318,12 @@ export interface UserAnalytics {
 export async function getUserInterviews(userId: string): Promise<FirestoreInterviewSession[]> {
   const q = query(
     collection(db, 'interview_sessions'),
-    where('userId', '==', userId),
-    orderBy('createdAt', 'desc')
+    where('userId', '==', userId)
   );
   
   const snapshot = await getDocs(q);
   
-  return snapshot.docs.map(doc => {
+  const sessions = snapshot.docs.map(doc => {
     const data = doc.data();
     return {
       ...data,
@@ -331,6 +332,9 @@ export async function getUserInterviews(userId: string): Promise<FirestoreInterv
       completedAt: data.completedAt ? (data.completedAt instanceof Timestamp ? data.completedAt.toDate() : new Date(data.completedAt)) : undefined,
     } as FirestoreInterviewSession;
   });
+
+  // Sort manually to avoid composite index requirement in production
+  return sessions.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }
 
 export async function getUserAnalytics(userId: string): Promise<UserAnalytics> {
@@ -460,13 +464,12 @@ export async function submitJobApplication(applicationData: Omit<JobApplication,
 export async function getHRApplications(hrId: string): Promise<JobApplication[]> {
   const q = query(
     collection(db, 'job_applications'),
-    where('hrId', '==', hrId),
-    orderBy('createdAt', 'desc')
+    where('hrId', '==', hrId)
   );
   
   const snapshot = await getDocs(q);
   
-  return snapshot.docs.map(doc => {
+  const applications = snapshot.docs.map(doc => {
     const data = doc.data();
     return {
       id: doc.id,
@@ -474,6 +477,9 @@ export async function getHRApplications(hrId: string): Promise<JobApplication[]>
       createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(data.createdAt),
     } as JobApplication;
   });
+
+  // Sort manually to avoid composite index requirement in production
+  return applications.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }
 
 export async function updateApplicationStatus(applicationId: string, status: JobApplication['status']): Promise<void> {
@@ -499,13 +505,12 @@ export async function createNotification(notificationData: Omit<Notification, 'i
 export async function getUserNotifications(userId: string): Promise<Notification[]> {
   const q = query(
     collection(db, 'notifications'),
-    where('userId', '==', userId),
-    orderBy('createdAt', 'desc')
+    where('userId', '==', userId)
   );
   
   const snapshot = await getDocs(q);
   
-  return snapshot.docs.map(doc => {
+  const notifications = snapshot.docs.map(doc => {
     const data = doc.data();
     return {
       id: doc.id,
@@ -513,6 +518,9 @@ export async function getUserNotifications(userId: string): Promise<Notification
       createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(data.createdAt),
     } as Notification;
   });
+
+  // Sort manually to avoid composite index requirement in production
+  return notifications.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }
 
 export async function markNotificationAsRead(notificationId: string): Promise<void> {
