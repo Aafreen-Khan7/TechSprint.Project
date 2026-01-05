@@ -9,8 +9,8 @@ import {
   Search, Bell, Menu, X, ChevronRight, ExternalLink, Globe
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getHRHiringPosts, createHiringPost, deleteHiringPost, uploadHiringPostImage } from '@/services/firebaseService';
-import { HiringPost } from '@/types/interview';
+import { getHRHiringPosts, createHiringPost, deleteHiringPost, uploadHiringPostImage, getHRApplications } from '@/services/firebaseService';
+import { HiringPost, JobApplication } from '@/types/interview';
 import Logo from '@/components/Logo';
 import {
   Dialog,
@@ -44,6 +44,13 @@ const HRDashboard = () => {
   const location = useLocation();
 
   const [posts, setPosts] = React.useState<HiringPost[]>([]);
+  const [applications, setApplications] = React.useState<JobApplication[]>([]);
+  const [stats, setStats] = React.useState({
+    totalInterviews: 0,
+    activeCandidates: 0,
+    successRate: 0,
+    avgScore: 0
+  });
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
@@ -147,11 +154,38 @@ const HRDashboard = () => {
   const loadPosts = async () => {
     if (!user) return;
     try {
-      const hrPosts = await getHRHiringPosts(user.id);
+      const [hrPosts, hrApps] = await Promise.all([
+        getHRHiringPosts(user.id),
+        getHRApplications(user.id)
+      ]);
+      
       setPosts(hrPosts);
+      setApplications(hrApps);
+      
+      // Calculate dynamic stats
+      const totalInterviews = hrApps.length;
+      const activeCandidates = hrApps.filter(app => app.status !== 'rejected').length;
+      const successfulApps = hrApps.filter(app => 
+        app.status === 'shortlisted' || 
+        app.status === 'interview_sent'
+      ).length;
+      const successRate = totalInterviews > 0 
+        ? Math.round((successfulApps / totalInterviews) * 100) 
+        : 0;
+      
+      setStats({
+        totalInterviews,
+        activeCandidates,
+        successRate,
+        avgScore: 0 // Avg score would require fetching actual interview results
+      });
     } catch (error) {
-      console.error('Error loading posts:', error);
+      console.error('Error loading dashboard data:', error);
     }
+  };
+
+  const getPostApplicationCount = (postId: string) => {
+    return applications.filter(app => app.postId === postId).length;
   };
 
   const handleDeletePost = async (postId: string) => {
@@ -381,10 +415,10 @@ const HRDashboard = () => {
             {/* Stats Overview */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { label: 'Total Interviews', value: '0', icon: Briefcase, color: 'text-blue-400', bg: 'bg-blue-400/10' },
-                { label: 'Active Candidates', value: '0', icon: Users, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
-                { label: 'Success Rate', value: '0%', icon: TrendingUp, color: 'text-purple-400', bg: 'bg-purple-400/10' },
-                { label: 'Avg. Score', value: '0.0', icon: BarChart3, color: 'text-orange-400', bg: 'bg-orange-400/10' },
+                { label: 'Total Interviews', value: stats.totalInterviews.toString(), icon: Briefcase, color: 'text-blue-400', bg: 'bg-blue-400/10' },
+                { label: 'Active Candidates', value: stats.activeCandidates.toString(), icon: Users, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
+                { label: 'Success Rate', value: `${stats.successRate}%`, icon: TrendingUp, color: 'text-purple-400', bg: 'bg-purple-400/10' },
+                { label: 'Avg. Score', value: stats.avgScore.toFixed(1), icon: BarChart3, color: 'text-orange-400', bg: 'bg-orange-400/10' },
               ].map((stat, i) => (
                 <Card key={i} className="bg-[#111827] border-slate-800/50 shadow-sm p-6 hover:translate-y-[-2px] transition-all duration-300">
                   <div className="flex justify-between items-start">
@@ -456,7 +490,7 @@ const HRDashboard = () => {
                                 {post.salaryRange && <span className="flex items-center gap-1 font-medium text-slate-400"><DollarSign className="w-3.5 h-3.5" /> {post.salaryRange}</span>}
                               </div>
                               <div className="mt-3 flex items-center gap-2">
-                                <p className="text-xs text-slate-600 uppercase tracking-widest font-bold">Applications: 0</p>
+                                <p className="text-xs text-slate-600 uppercase tracking-widest font-bold">Applications: {getPostApplicationCount(post.id)}</p>
                                 <Separator orientation="vertical" className="h-3 bg-slate-800" />
                                 <p className="text-xs text-slate-600">Posted: {post.createdAt.toLocaleDateString()}</p>
                               </div>

@@ -117,6 +117,16 @@ export interface JobApplication {
   jobTitle: string; // Denormalized for easier display
 }
 
+export interface Notification {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type: 'INTERVIEW' | 'REJECTION' | 'SYSTEM' | string;
+  read: boolean;
+  createdAt: Date;
+}
+
 export interface AnalyticsData {
   totalSessions: number;
   averageScore: number;
