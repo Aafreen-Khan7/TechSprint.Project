@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,7 @@ import { ArrowLeft, Loader2, Mail, Lock, User, Building, Users, Briefcase, Eye, 
 
 const HRSignup = () => {
   const navigate = useNavigate();
-  const { hrSignup } = useAuth();
+  const { hrSignup, user } = useAuth();
   const { toast } = useToast();
 
   const [isLoading, setIsLoading] = useState(false);

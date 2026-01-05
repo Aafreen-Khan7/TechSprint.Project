@@ -15,9 +15,10 @@ import Logo from '@/components/Logo';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  requiredRole?: 'candidate' | 'HR';
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
   const { user, isLoading } = useAuth();
   const location = useLocation();
 
@@ -122,6 +123,19 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         replace 
       />
     );
+  }
+
+  if (requiredRole && user.role !== requiredRole) {
+    if (user.role === 'HR') {
+      return <Navigate to="/hr/dashboard" replace />;
+    } else {
+      return <Navigate to="/dashboard" replace />;
+    }
+  }
+
+  // Redirect HR users if they try to access candidate dashboard
+  if (location.pathname === '/dashboard' && user.role === 'HR') {
+    return <Navigate to="/hr/dashboard" replace />;
   }
 
   return <>{children}</>;

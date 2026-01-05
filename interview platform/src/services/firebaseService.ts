@@ -86,6 +86,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
   
   if (snapshot.exists()) {
     const userData = snapshot.data();
+    console.log('Found candidate profile:', userData);
     return {
       ...userData,
       id: snapshot.id,
@@ -99,6 +100,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
   
   if (hrSnapshot.exists()) {
     const hrData = hrSnapshot.data();
+    console.log('Found HR profile:', hrData);
     return {
       ...hrData,
       id: hrSnapshot.id,
