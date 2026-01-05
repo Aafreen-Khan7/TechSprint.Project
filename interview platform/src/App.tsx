@@ -35,49 +35,49 @@ const App = () => (
               <Route path="/" element={<Landing />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={
-                <ProtectedRoute>
+                <ProtectedRoute requiredRole="candidate">
                   <Dashboard />
                 </ProtectedRoute>
               } />
               <Route path="/profile" element={
-                <ProtectedRoute>
+                <ProtectedRoute requiredRole="candidate">
                   <Profile />
                 </ProtectedRoute>
               } />
               <Route path="/setup" element={
-                <ProtectedRoute>
+                <ProtectedRoute requiredRole="candidate">
                   <InterviewSetup />
                 </ProtectedRoute>
               } />
               <Route path="/interview" element={
-                <ProtectedRoute>
+                <ProtectedRoute requiredRole="candidate">
                   <InterviewSession />
                 </ProtectedRoute>
               } />
               <Route path="/results" element={
-                <ProtectedRoute>
+                <ProtectedRoute requiredRole="candidate">
                   <Results />
                 </ProtectedRoute>
               } />
               <Route path="/hr/signup" element={<HRSignup />} />
               <Route path="/hr/login" element={<HRLogin />} />
               <Route path="/hr/dashboard" element={
-                <ProtectedRoute>
+                <ProtectedRoute requiredRole="HR">
                   <HRDashboard />
                 </ProtectedRoute>
               } />
               <Route path="/hr/applications" element={
-                <ProtectedRoute>
+                <ProtectedRoute requiredRole="HR">
                   <HRApplications />
                 </ProtectedRoute>
               } />
               <Route path="/hr/my-posts" element={
-                <ProtectedRoute>
+                <ProtectedRoute requiredRole="HR">
                   <HRMyPosts />
                 </ProtectedRoute>
               } />
               <Route path="/job-alerts" element={
-                <ProtectedRoute>
+                <ProtectedRoute requiredRole="candidate">
                   <JobAlerts />
                 </ProtectedRoute>
               } />

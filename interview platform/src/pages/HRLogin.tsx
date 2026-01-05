@@ -23,9 +23,10 @@ const HRLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    if (shouldNavigate && user) {
+    if (user && shouldNavigate) {
       if (user.role === 'HR') {
         navigate('/hr/dashboard', { replace: true });
+        setShouldNavigate(false);
       } else {
         toast({ 
           title: 'Access Denied', 
@@ -33,6 +34,7 @@ const HRLogin = () => {
           variant: 'destructive' 
         });
         setShouldNavigate(false);
+        navigate('/dashboard', { replace: true });
       }
     }
   }, [user, shouldNavigate, navigate, toast]);

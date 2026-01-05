@@ -46,6 +46,7 @@ export const TIME_LIMITS: Record<Difficulty, number> = {
 };
 
 export interface InterviewSession {
+  resumeUsed: any;
   id: string;
   userId: string;
   jobRole: JobRole;
@@ -114,16 +115,6 @@ export interface JobApplication {
   status: 'pending' | 'reviewed' | 'shortlisted' | 'rejected' | 'interview_sent' | 'apology_sent';
   createdAt: Date;
   jobTitle: string; // Denormalized for easier display
-}
-
-export interface Notification {
-  id: string;
-  userId: string;
-  title: string;
-  message: string;
-  type: 'INTERVIEW' | 'REJECTION';
-  read: boolean;
-  createdAt: Date;
 }
 
 export interface AnalyticsData {

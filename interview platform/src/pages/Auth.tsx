@@ -40,7 +40,8 @@ const Auth = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
-    if (shouldNavigate && user) {
+    if (user && shouldNavigate) {
+      console.log('Login attempt with role:', user.role);
       if (user.role === 'HR') {
         toast({ 
           title: 'HR Account Detected', 
@@ -48,6 +49,7 @@ const Auth = () => {
           variant: 'destructive' 
         });
         setShouldNavigate(false);
+        navigate('/hr/dashboard', { replace: true });
         return;
       }
       navigate('/dashboard', { replace: true });
