@@ -1,61 +1,91 @@
-<<<<<<< HEAD
+# TechSprint.Project
 
-## How can I edit this code?
+AI-powered interview and hiring platform with two user experiences:
+- Candidate portal for interview practice and job applications
+- HR portal for posting jobs, reviewing applications, and candidate workflows
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- React + TypeScript + Vite
+- Firebase (Auth + Firestore)
+- Cloudinary (media storage for banners/resumes)
+- Tailwind + shadcn/ui
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/bf87d991-a387-421f-a115-d806cac3dd5c) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Local Setup
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Default dev URL: `http://localhost:5173`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Environment Variables
 
-**Use GitHub Codespaces**
+Create a `.env` file in this folder and add values for your environment.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Required (Core)
 
-## What technologies are used for this project?
+```env
+VITE_FIREBASE_API_KEY=...
+VITE_FIREBASE_AUTH_DOMAIN=...
+VITE_FIREBASE_PROJECT_ID=...
+VITE_FIREBASE_STORAGE_BUCKET=...
+VITE_FIREBASE_MESSAGING_SENDER_ID=...
+VITE_FIREBASE_APP_ID=...
+```
 
-This project is built with:
+### Required (Cloudinary)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```env
+VITE_CLOUDINARY_CLOUD_NAME=your_cloud_name
+VITE_CLOUDINARY_UPLOAD_PRESET=your_upload_preset
+```
 
-=======
-# TechSprint.Project
->>>>>>> 6f58b10c6cbf44c79b8303e9f0a79c1166fe4dd2
+### Optional (AI / Notifications)
+
+```env
+VITE_GEMINI_API_KEY=...
+VITE_EMAILJS_SERVICE_ID=...
+VITE_EMAILJS_TEMPLATE_INTERVIEW=...
+VITE_EMAILJS_TEMPLATE_APOLOGY=...
+VITE_EMAILJS_PUBLIC_KEY=...
+```
+
+## Cloudinary Setup
+
+1. Create a Cloudinary account and open the dashboard.
+2. Go to Settings > Upload and create an unsigned upload preset.
+3. In the preset, allow uploads for:
+- images (job banners/profile photos)
+- raw files (PDF/DOC/DOCX resumes)
+4. Copy your cloud name from the dashboard.
+5. Add the Cloudinary values to `.env`.
+6. Restart the Vite dev server after updating `.env`.
+
+Current upload usage:
+- Hiring post banners: `interview-platform/hiring-posts`
+- Candidate resumes: `interview-platform/resumes`
+
+## Role-Based Routing
+
+After successful login:
+- Candidate accounts redirect to `/dashboard`
+- HR accounts redirect to `/hr/dashboard`
+
+## Useful Scripts
+
+```sh
+npm run dev       # start local dev server
+npm run build     # production build
+npm run preview   # preview production build
+npm run lint      # run lint checks
+```
+
+## Resume Viewing Troubleshooting
+
+If HR cannot open resumes:
+1. Confirm Cloudinary preset allows the uploaded file type.
+2. Verify file exists in Cloudinary Media Library.
+3. Check Cloudinary security settings for document delivery.
+4. Re-upload an old resume created before Cloudinary migration.
